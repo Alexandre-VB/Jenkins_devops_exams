@@ -5,9 +5,10 @@ metadata:
   namespace: standard
 spec:
   selector:
-    app: cast
+    app: cast-service
+    spec:
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8000
-  type: NodePort
+  type: ClusterIP
