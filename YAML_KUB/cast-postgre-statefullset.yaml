@@ -4,17 +4,17 @@ metadata:
   name: cast-postgres-statefulset
   namespace: standard
 spec:
-  serviceName: "postgres"
+  serviceName: "cast-postgres"
   selector:
     matchLabels:
-      app: postgres
+      app: cast-postgres
   template:
     metadata:
       labels:
-        app: postgres
+        app: cast-postgres
     spec:
       containers:
-      - name: postgres
+      - name: cast-postgres
         image: postgres:12.1-alpine
         ports:
         - containerPort: 5432
