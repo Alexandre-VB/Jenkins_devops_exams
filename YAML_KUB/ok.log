@@ -1,0 +1,6 @@
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [1]
+INFO:     Started server process [7]
+INFO:     Waiting for application startup.
+INFO:     Connected to database postgresql://cast_db_username:********@cast-db:5432/cast_db_dev
+INFO:     Application startup complete.

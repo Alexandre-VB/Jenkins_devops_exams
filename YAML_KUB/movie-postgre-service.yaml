@@ -1,14 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: movie-service
+  name: movie-db
   namespace: standard
 spec:
   selector:
-    app: movie-service
+    app: postgres
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8000
+      port: 5432
+      targetPort: 5432
   type: ClusterIP
-
