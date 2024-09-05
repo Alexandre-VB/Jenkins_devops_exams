@@ -13,6 +13,16 @@ spec:
       labels:
         app: cast-service
     spec:
+      initContainers: 
+        - name: wait-for-db
+          image: postgres:12.1-alpine
+          command: ['sh', '-c', 'until pg_isready -h cast-db -p 5432 -U $(POSTGRES_USER); do echo waiting for postgres; sleep 2; done;']
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cast-postgres-secret
+                  key: POSTGRES_USER
       containers:
         - name: cast-service
           image: alexandrevb/cast-image:v.3.0
@@ -37,3 +47,4 @@ spec:
                   key: POSTGRES_DB
             - name: DATABASE_URI
               value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@cast-db:5432/$(POSTGRES_DB)"
+

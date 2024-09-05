@@ -5,6 +5,7 @@ metadata:
   namespace: standard
 spec:
   replicas: 1
+  progressDeadlineSeconds: 10
   selector:
     matchLabels:
       app: movie-service
@@ -13,6 +14,16 @@ spec:
       labels:
         app: movie-service
     spec:
+      initContainers: 
+        - name: wait-for-db
+          image: postgres:12.1-alpine
+          command: ['sh', '-c', 'until pg_isready -h cast-db -p 5432 -U $(POSTGRES_USER); do echo waiting for postgres; sleep 2; done;']
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: movie-postgres-secret
+                  key: POSTGRES_USER
       containers:
         - name: movie-service
           image: alexandrevb/movie-image:v.3.0
