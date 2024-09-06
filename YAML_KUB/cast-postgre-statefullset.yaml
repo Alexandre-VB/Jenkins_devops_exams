@@ -4,14 +4,14 @@ metadata:
   name: cast-postgres-statefulset
   namespace: standard
 spec:
-  serviceName: "cast-postgres"
+  serviceName: "cast-db"
   selector:
     matchLabels:
-      app: cast-postgres
+      app: cast-db
   template:
     metadata:
       labels:
-        app: cast-postgres
+        app: cast-db
     spec:
       containers:
       - name: cast-postgres
@@ -47,5 +47,5 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 1Gi
       storageClassName: local-path

@@ -4,14 +4,14 @@ metadata:
   name: movie-postgres-statefulset
   namespace: standard
 spec:
-  serviceName: "postgres"
+  serviceName: "movie-db"
   selector:
     matchLabels:
-      app: postgres
+      app: movie-db
   template:
     metadata:
       labels:
-        app: postgres
+        app: movie-db
     spec:
       containers:
       - name: postgres
@@ -47,6 +47,6 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 1Gi
       storageClassName: local-path
 

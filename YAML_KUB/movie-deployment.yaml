@@ -5,7 +5,6 @@ metadata:
   namespace: standard
 spec:
   replicas: 1
-  progressDeadlineSeconds: 10
   selector:
     matchLabels:
       app: movie-service
@@ -17,7 +16,7 @@ spec:
       initContainers: 
         - name: wait-for-db
           image: postgres:12.1-alpine
-          command: ['sh', '-c', 'until pg_isready -h cast-db -p 5432 -U $(POSTGRES_USER); do echo waiting for postgres; sleep 2; done;']
+          command: ['sh', '-c', 'until pg_isready -h movie-db -p 5432 -U $(POSTGRES_USER); do echo waiting for postgres; sleep 2; done;']
           env:
             - name: POSTGRES_USER
               valueFrom:
