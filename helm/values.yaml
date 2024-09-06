@@ -1,0 +1,30 @@
+namepace: standard
+
+cast:
+  replicaCount: 1
+  image:
+    repository: alexandrevb/cast-image
+    tag: v.3.0
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  postgres:
+    user: Y2FzdF9kYl91c2VybmFtZQ==
+    password: Y2FzdF9kYl9wYXNzd29yZA==
+    db: Y2FzdF9kYl9kZXY=
+
+movie:
+  replicaCount: 1
+  image:
+    repository: alexandrevb/movie-image
+    tag: v.3.0
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  postgres:
+    user: bW92aWVfZGJfdXNlcm5hbWU=
+    password: bW92aWVfZGJfcGFzc3dvcmQ=
+    db: bW92aWVfZGJfZGV2
+
