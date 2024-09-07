@@ -37,7 +37,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''
-                                    curl localhost:8080/api/v1/movies
+                                    curl localhost:8080
                                     '''
                                 }
                             }
@@ -71,7 +71,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''
-                                    curl localhost:8081/api/v1/casts
+                                    curl localhost:8081
                                     '''
                                 }
                             }
