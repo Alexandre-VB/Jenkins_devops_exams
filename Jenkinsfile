@@ -103,6 +103,8 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    kubectl delete -f helm/chart/templates/persistentvolume.yaml --namespace dev || true
+                    kubectl delete -f helm/chart/templates/persistentvolumeclaim.yaml --namespace dev || true
                     rm -Rf .kube
                     mkdir .kube
                     cat $KUBECONFIG > .kube/config
