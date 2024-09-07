@@ -27,6 +27,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''
+			            docker rm -f movie_service || true
                                     docker run -d -p 8080:80 --name movie_service $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
                                     sleep 10
                                     '''
@@ -61,6 +62,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''
+ 			            docker rm -f cast_service || true
                                     docker run -d -p 8081:80 --name cast_service $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG
                                     sleep 10
                                     '''
