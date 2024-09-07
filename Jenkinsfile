@@ -108,7 +108,24 @@ pipeline {
                     cat $KUBECONFIG > .kube/config
                     cp helm/values.yaml values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-                    helm upgrade --install app fastapi --values=values.yml --namespace dev
+                    helm upgrade --install app ./helm --values=values.yml --namespace dev
+                    '''
+                }
+            }
+        }
+        stage('Deploiement en QA') {
+            environment {
+                KUBECONFIG = credentials("config") // Récupère kubeconfig depuis Jenkins credentials
+            }
+            steps {
+                script {
+                    sh '''
+                    rm -Rf .kube
+                    mkdir .kube
+                    cat $KUBECONFIG > .kube/config
+                    cp helm/values.yaml values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    helm upgrade --install app ./helm --values=values.yml --namespace qa
                     '''
                 }
             }
@@ -125,7 +142,7 @@ pipeline {
                     cat $KUBECONFIG > .kube/config
                     cp helm/values.yaml values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-                    helm upgrade --install app fastapi --values=values.yml --namespace staging
+                    helm upgrade --install app ./helm --values=values.yml --namespace staging
                     '''
                 }
             }
@@ -145,7 +162,7 @@ pipeline {
                     cat $KUBECONFIG > .kube/config
                     cp helm/values.yaml values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-                    helm upgrade --install app fastapi --values=values.yml --namespace prod
+                    helm upgrade --install app ./helm --values=values.yml --namespace prod
                     '''
                 }
             }
