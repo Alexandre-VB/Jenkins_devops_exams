@@ -38,7 +38,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''
-                                    curl localhost:8080
+                                    curl localhost
                                     '''
                                 }
                             }
@@ -73,7 +73,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''
-                                    curl localhost:8081
+                                    curl localhost
                                     '''
                                 }
                             }
