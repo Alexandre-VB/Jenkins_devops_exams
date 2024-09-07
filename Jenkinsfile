@@ -8,54 +8,82 @@ pipeline {
     agent any // Jenkins will be able to select all available agents
 
     stages {
-        stage('Docker Build') {
+    stages {
+        stage('Build, Run and Test in Parallel') {
             parallel {
-                stage('Docker Build movie image') {
-                    steps {
-                        script {
-                            sh '''
-                            docker rm -f jenkins
-                            docker build -t $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG ./movie-service/
-                            sleep 6
-                            '''
+                stage('Movie Service Pipeline') {
+                    stages {
+                        stage('Docker Build Movie Image') {
+                            steps {
+                                script {
+                                    sh '''
+                                    docker rm -f jenkins || true
+                                    docker build -t $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG ./movie-service/
+                                    sleep 6
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Docker Run Movie Image') {
+                            steps {
+                                script {
+                                    sh '''
+                                    docker run -d -p 8080:80 --name movie_service $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
+                                    sleep 10
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Test Movie Service') {
+                            steps {
+                                script {
+                                    sh '''
+                                    curl localhost:8080/api/v1/movies
+                                    '''
+                                }
+                            }
                         }
                     }
                 }
-                stage('Docker Build cast image') {
-                    steps {
-                        script {
-                            sh '''
-                            docker rm -f jenkins
-                            docker build -t $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG ./cast-service/
-                            sleep 6
-                            '''
+                stage('Cast Service Pipeline') {
+                    stages {
+                        stage('Docker Build Cast Image') {
+                            steps {
+                                script {
+                                    sh '''
+                                    docker rm -f jenkins || true
+                                    docker build -t $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG ./cast-service/
+                                    sleep 6
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Docker Run Cast Image') {
+                            steps {
+                                script {
+                                    sh '''
+                                    docker run -d -p 8081:80 --name cast_service $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG
+                                    sleep 10
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Test Cast Service') {
+                            steps {
+                                script {
+                                    sh '''
+                                    curl localhost:8081/api/v1/casts
+                                    '''
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        stage('Docker run') { // run container from our built image
-            steps {
-                script {
-                    sh '''
-                    docker run -d -p 80:80 --name jenkins $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
-                    sleep 10
-                    '''
-                }
-            }
-        }
-        stage('Test Acceptance') { // we launch the curl command to validate that the container responds to the request
-            steps {
-                script {
-                    sh '''
-                    curl localhost
-                    '''
-                }
-            }
-        }
-        stage('Docker Push') { // we pass the built image to our docker hub account
+        stage('Docker Push') {
             environment {
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve docker password from secret text called docker_hub_pass saved on jenkins
+                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // Get docker password from Jenkins credentials
             }
             steps {
                 script {
@@ -69,17 +97,15 @@ pipeline {
         }
         stage('Deploiement en dev') {
             environment {
-                KUBECONFIG = credentials("config") // we retrieve kubeconfig from secret file called config saved on jenkins
+                KUBECONFIG = credentials("config") // Get kubeconfig from Jenkins credentials
             }
             steps {
                 script {
                     sh '''
                     rm -Rf .kube
                     mkdir .kube
-                    ls
                     cat $KUBECONFIG > .kube/config
                     cp helm/values.yaml values.yml
-                    cat values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                     helm upgrade --install app fastapi --values=values.yml --namespace dev
                     '''
@@ -88,17 +114,15 @@ pipeline {
         }
         stage('Deploiement en staging') {
             environment {
-                KUBECONFIG = credentials("config") // we retrieve kubeconfig from secret file called config saved on jenkins
+                KUBECONFIG = credentials("config") // Get kubeconfig from Jenkins credentials
             }
             steps {
                 script {
                     sh '''
                     rm -Rf .kube
                     mkdir .kube
-                    ls
                     cat $KUBECONFIG > .kube/config
                     cp helm/values.yaml values.yml
-                    cat values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                     helm upgrade --install app fastapi --values=values.yml --namespace staging
                     '''
@@ -107,11 +131,9 @@ pipeline {
         }
         stage('Deploiement en prod') {
             environment {
-                KUBECONFIG = credentials("config") // we retrieve kubeconfig from secret file called config saved on jenkins
+                KUBECONFIG = credentials("config") // Get kubeconfig from Jenkins credentials
             }
             steps {
-                // Create an Approval Button with a timeout of 15 minutes.
-                // this requires a manual validation in order to deploy on the production environment
                 timeout(time: 15, unit: "MINUTES") {
                     input message: 'Do you want to deploy in production ?', ok: 'Yes'
                 }
@@ -119,10 +141,8 @@ pipeline {
                     sh '''
                     rm -Rf .kube
                     mkdir .kube
-                    ls
                     cat $KUBECONFIG > .kube/config
                     cp helm/values.yaml values.yml
-                    cat values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                     helm upgrade --install app fastapi --values=values.yml --namespace prod
                     '''
@@ -131,4 +151,3 @@ pipeline {
         }
     }
 }
-
