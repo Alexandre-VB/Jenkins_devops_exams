@@ -103,9 +103,11 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    kubectl delete -f helm/chart/templates/persistentvolume.yaml --namespace dev || true
-                    kubectl delete -f helm/chart/templates/persistentvolumeclaim.yaml --namespace dev || true
-                    rm -Rf .kube
+                    kubectl delete pv cast-postgres-pv || true
+                    kubectl delete pvc cast-postgres-storage-cast-postgres-statefulset-0 --namespace dev || true
+                    kubectl delete pv movie-postgres-pv || true
+                    kubectl delete pvc movie-postgres-storage-cast-postgres-statefulset-0 --namespace dev || true
+		    rm -Rf .kube
                     mkdir .kube
                     cat $KUBECONFIG > .kube/config
                     cp helm/values.yaml values.yml
