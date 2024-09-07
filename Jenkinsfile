@@ -1,13 +1,12 @@
 pipeline {
-    environment { // Declaration of environment variables
-        DOCKER_ID = "alexandrevb" // replace this with your docker-id
+    environment { // Déclaration des variables d'environnement
+        DOCKER_ID = "alexandrevb" // Remplacez par votre docker-id
         DOCKER_IMAGE_MOVIE = "movie-image"
         DOCKER_IMAGE_CAST = "cast-image"
-        DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
+        DOCKER_TAG = "v.${BUILD_ID}.0" // Tag de version avec l'ID de build
     }
-    agent any // Jenkins will be able to select all available agents
+    agent any // Jenkins peut sélectionner tous les agents disponibles
 
-    stages {
     stages {
         stage('Build, Run and Test in Parallel') {
             parallel {
@@ -83,7 +82,7 @@ pipeline {
         }
         stage('Docker Push') {
             environment {
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // Get docker password from Jenkins credentials
+                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // Récupère le mot de passe Docker depuis Jenkins credentials
             }
             steps {
                 script {
@@ -97,7 +96,7 @@ pipeline {
         }
         stage('Deploiement en dev') {
             environment {
-                KUBECONFIG = credentials("config") // Get kubeconfig from Jenkins credentials
+                KUBECONFIG = credentials("config") // Récupère kubeconfig depuis Jenkins credentials
             }
             steps {
                 script {
@@ -114,7 +113,7 @@ pipeline {
         }
         stage('Deploiement en staging') {
             environment {
-                KUBECONFIG = credentials("config") // Get kubeconfig from Jenkins credentials
+                KUBECONFIG = credentials("config") // Récupère kubeconfig depuis Jenkins credentials
             }
             steps {
                 script {
@@ -131,7 +130,7 @@ pipeline {
         }
         stage('Deploiement en prod') {
             environment {
-                KUBECONFIG = credentials("config") // Get kubeconfig from Jenkins credentials
+                KUBECONFIG = credentials("config") // Récupère kubeconfig depuis Jenkins credentials
             }
             steps {
                 timeout(time: 15, unit: "MINUTES") {
