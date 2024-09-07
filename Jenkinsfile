@@ -103,8 +103,6 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    kubectl delete pv cast-postgres-pv || true
-                    kubectl delete pv movie-postgres-pv || true
 		    rm -Rf .kube
                     mkdir .kube
                     cat $KUBECONFIG > .kube/config
